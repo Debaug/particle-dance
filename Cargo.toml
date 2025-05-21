@@ -1,0 +1,16 @@
+[package]
+name = "particle-dance"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bytemuck = "1.23.0"
+color-eyre = "0.6.4"
+env_logger = "0.11.8"
+futures = { version = "0.3.31", features = ["executor"] }
+glam = { version = "0.30.3", features = ["bytemuck"] }
+itertools = "0.14.0"
+log = "0.4.27"
+rand = "0.9.1"
+wgpu = "25.0.0"
+winit = "0.30.10"
