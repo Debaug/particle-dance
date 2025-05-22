@@ -707,6 +707,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b46b9ca4690308844c644e7c634d68792467260e051c8543e0c7871662b3ba7"
 dependencies = [
  "bytemuck",
+ "rand",
 ]
 
 [[package]]
