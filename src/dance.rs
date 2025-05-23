@@ -2,7 +2,7 @@ use std::{f32, iter};
 
 use bytemuck::{Pod, Zeroable};
 use color_eyre::eyre::Result;
-use glam::{Affine2, Mat3, Vec2, Vec4};
+use glam::{vec2, Affine2, Mat3, Vec2, Vec4};
 use itertools::Itertools;
 use rand::Rng;
 use render::Renderer;
@@ -72,7 +72,7 @@ impl DanceSubApp {
     pub fn new(n_points: usize, transformation_colors: Vec<Vec4>, context: &Context) -> Self {
         let mut rng = rand::rng();
         let points = iter::repeat_with(|| Point {
-            pos: rng.random::<Vec2>() * 2.0 - 1.0,
+            pos: vec2(rng.random(), rng.random()) * 2.0 - 1.0,
         })
         .take(n_points)
         .collect_vec();
