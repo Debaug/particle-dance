@@ -1,6 +1,6 @@
 use log::info;
 
-use crate::app::{SubApp, SubAppBuilder};
+use crate::app::{SubApp, SubAppBuilder, Time};
 
 pub struct LogSubApp;
 
@@ -8,9 +8,13 @@ impl SubApp for LogSubApp {
     fn update(
         &mut self,
         _context: &crate::app::Context,
-        delta_time: std::time::Duration,
+        time: Time,
     ) -> color_eyre::eyre::Result<()> {
-        info!("delta = {}ms", delta_time.as_millis());
+        info!(
+            "elapsed = {}s, delta = {}ms",
+            time.elapsed_f32 as u32,
+            time.delta.as_millis()
+        );
         Ok(())
     }
 }

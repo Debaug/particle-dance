@@ -1,4 +1,5 @@
 use std::{
+    mem,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -11,14 +12,15 @@ use winit::{self as w};
 
 pub struct App {
     inner: AppInner,
-    last_frame_time: Instant,
+    start: Instant,
+    time: Time,
     next_frame_time: Instant,
     target_delta_time: Duration,
-    delta_time: Duration,
 }
 
 enum AppInner {
     Created {
+        window_attributes: w::window::WindowAttributes,
         sub_app_builders: Vec<Box<dyn SubAppBuilder>>,
     },
     Ready {
@@ -27,6 +29,7 @@ enum AppInner {
     },
 }
 
+#[derive(Debug)]
 pub struct Context {
     pub instance: g::Instance,
     pub adapter: g::Adapter,
@@ -37,35 +40,55 @@ pub struct Context {
     pub surface_config: g::SurfaceConfiguration,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct Time {
+    pub time: Instant,
+    pub elapsed: Duration,
+    pub elapsed_f32: f32,
+    pub delta: Duration,
+    pub delta_f32: f32,
+}
+
 pub trait SubAppBuilder: 'static {
     fn build(self: Box<Self>, context: &Context) -> Result<Box<dyn SubApp>>;
 }
 
 pub trait SubApp: 'static {
-    fn update(&mut self, context: &Context, delta_time: Duration) -> Result<()>;
+    fn update(&mut self, context: &Context, time: Time) -> Result<()>;
 }
 
 impl App {
-    pub fn new(delta_time: Duration) -> Self {
+    pub fn new(delta_time: Duration, window_attributes: w::window::WindowAttributes) -> Self {
+        let now = Instant::now();
+
+        let time = Time {
+            time: now,
+            elapsed: Duration::ZERO,
+            elapsed_f32: 0.0,
+            delta: Duration::ZERO,
+            delta_f32: 0.0,
+        };
+
         Self {
             inner: AppInner::Created {
                 sub_app_builders: vec![],
+                window_attributes,
             },
-            last_frame_time: Instant::now(),
+            start: now,
+            time,
             next_frame_time: Instant::now(),
             target_delta_time: delta_time,
-            delta_time: Duration::ZERO,
         }
     }
 
     pub fn add_sub_app<T: SubAppBuilder>(&mut self, builder: T) -> &mut Self {
         let AppInner::Created {
-            sub_app_builders: sub_app_builder,
+            sub_app_builders, ..
         } = &mut self.inner
         else {
             panic!("tried to add a sub app to a ready app")
         };
-        sub_app_builder.push(Box::new(builder));
+        sub_app_builders.push(Box::new(builder));
         self
     }
 
@@ -84,8 +107,11 @@ impl App {
             return;
         }
 
-        self.delta_time = now - self.last_frame_time;
-        self.last_frame_time = now;
+        self.time.delta = now - self.time.time;
+        self.time.delta_f32 = self.time.delta.as_secs_f32();
+        self.time.time = now;
+        self.time.elapsed = self.time.time - self.start;
+        self.time.elapsed_f32 = self.time.elapsed.as_secs_f32();
         self.next_frame_time = now + self.target_delta_time;
         context.window.request_redraw();
     }
@@ -93,17 +119,17 @@ impl App {
 
 impl w::application::ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &w::event_loop::ActiveEventLoop) {
-        let AppInner::Created { sub_app_builders } = &mut self.inner else {
+        let AppInner::Created {
+            sub_app_builders,
+            window_attributes,
+        } = &mut self.inner
+        else {
             return;
         };
 
         event_loop.set_control_flow(w::event_loop::ControlFlow::Poll);
 
-        let window = match event_loop.create_window(
-            w::window::Window::default_attributes()
-                .with_resizable(false)
-                .with_inner_size(w::dpi::LogicalSize::new(600, 600)),
-        ) {
+        let window = match event_loop.create_window(mem::take(window_attributes)) {
             Ok(window) => window,
             Err(error) => {
                 error!("failed to create window: {error:?}");
@@ -155,7 +181,7 @@ impl w::application::ApplicationHandler for App {
 
             E::RedrawRequested => {
                 for sub_app in sub_apps {
-                    if let Err(error) = sub_app.update(context, self.delta_time) {
+                    if let Err(error) = sub_app.update(context, self.time) {
                         error!("failed to update sub-app: {error:?}");
                         event_loop.exit();
                         return;
