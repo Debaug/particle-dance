@@ -30,7 +30,7 @@ impl Renderer {
                     label: Some("render bind group layout"),
                     entries: &[g::BindGroupLayoutEntry {
                         binding: 0,
-                        visibility: g::ShaderStages::VERTEX,
+                        visibility: g::ShaderStages::FRAGMENT,
                         ty: g::BindingType::Buffer {
                             ty: g::BufferBindingType::Storage { read_only: true },
                             has_dynamic_offset: false,

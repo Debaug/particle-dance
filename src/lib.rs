@@ -13,8 +13,10 @@ pub mod log;
 
 pub fn run() -> Result<()> {
     env_logger::init();
-    App::new(Duration::from_millis(1000))
-        .add_sub_app(LogSubApp)
-        .add_sub_app(DanceSubAppBuilder { n_points: 1 << 13 })
+    App::new(Duration::from_millis(100))
+        // .add_sub_app(LogSubApp)
+        .add_sub_app(DanceSubAppBuilder {
+            n_points: 1_000_000,
+        })
         .run()
 }

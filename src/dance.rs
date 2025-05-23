@@ -1,8 +1,8 @@
-use std::iter;
+use std::{f32, iter};
 
 use bytemuck::{Pod, Zeroable};
 use color_eyre::eyre::Result;
-use glam::{vec2, Affine2, Mat3, Vec2};
+use glam::{vec2, vec4, Affine2, Mat3, Vec2, Vec4};
 use itertools::Itertools;
 use rand::Rng;
 use render::Renderer;
@@ -29,6 +29,7 @@ pub struct Transformation {
     pub center: Vec2,
     pub scale: f32,
     pub angle: f32,
+    pub color: Vec4,
 }
 
 #[derive(Debug, Clone, Copy, Zeroable, Pod)]
@@ -81,19 +82,22 @@ impl DanceSubApp {
 
         let transformations = [
             Transformation {
-                center: vec2(0.0, 1.0),
-                scale: 0.5,
+                center: vec2(0.0, -0.75),
+                scale: 0.33,
                 angle: 0.0,
+                color: vec4(1.0, 0.0, 0.0, 1.0),
             },
             Transformation {
-                center: vec2(-1.0, -1.0),
+                center: vec2(-0.5, -0.5),
                 scale: 0.5,
-                angle: 0.0,
+                angle: f32::consts::FRAC_PI_3,
+                color: vec4(0.0, 1.0, 0.0, 1.0),
             },
             Transformation {
-                center: vec2(1.0, -1.0),
-                scale: 0.5,
-                angle: 0.0,
+                center: vec2(0.25, 0.25),
+                scale: 0.8,
+                angle: f32::consts::FRAC_PI_4,
+                color: vec4(0.0, 0.0, 1.0, 1.0),
             },
         ]
         .map(ComputedTransformation::new);
