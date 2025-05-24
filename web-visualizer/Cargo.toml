@@ -1,0 +1,12 @@
+[package]
+name = "web-visualizer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+particle-dance = { path = "../particle-dance" }
+wasm-bindgen = "0.2.100"
+web-sys = { version = "0.3.77", features = ["HtmlCanvasElement"] }
+
+[lib]
+crate-type = ["cdylib", "rlib"]

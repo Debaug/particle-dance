@@ -1,3 +1,0 @@
-[submodule "rand"]
-	path = rand
-	url = https://github.com/rust-random/rand

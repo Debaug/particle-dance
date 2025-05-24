@@ -1,14 +1,12 @@
-use std::{
-    mem,
-    sync::Arc,
-    time::{Duration, Instant},
-};
+use std::{mem, sync::Arc};
 
 use color_eyre::eyre::Result;
 use itertools::Itertools;
 use log::error;
 use wgpu as g;
 use winit::{self as w};
+
+use crate::time::{Duration, Instant};
 
 pub struct App {
     inner: AppInner,

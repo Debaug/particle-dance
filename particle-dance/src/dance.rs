@@ -2,9 +2,8 @@ use std::{f32, iter};
 
 use bytemuck::{Pod, Zeroable};
 use color_eyre::eyre::Result;
-use glam::{vec2, Affine2, Mat3, Vec2, Vec4};
+use glam::{Affine2, Mat3, Vec2, Vec4};
 use itertools::Itertools;
-use rand::Rng;
 use render::Renderer;
 use sim::Simulator;
 use transformations::TransformationGenerator;
@@ -13,6 +12,7 @@ use wgpu as g;
 use crate::{
     app::{Context, SubApp, SubAppBuilder, Time},
     data::{Buffer, WgpuMat3x3},
+    random::Rng,
 };
 
 pub mod render;
@@ -70,9 +70,10 @@ pub struct DanceSubApp {
 
 impl DanceSubApp {
     pub fn new(n_points: usize, transformation_colors: Vec<Vec4>, context: &Context) -> Self {
-        let mut rng = rand::rng();
+        let mut rng = Rng::new();
+
         let points = iter::repeat_with(|| Point {
-            pos: vec2(rng.random(), rng.random()) * 2.0 - 1.0,
+            pos: rng.random::<Vec2>() * 2.0 - 1.0,
         })
         .take(n_points)
         .collect_vec();

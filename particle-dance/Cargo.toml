@@ -1,0 +1,20 @@
+[package]
+name = "particle-dance"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bytemuck = { version = "1.23.0", features = ["derive"] }
+color-eyre = "0.6.4"
+env_logger = "0.11.8"
+futures = { version = "0.3.31", features = ["executor"] }
+glam = { version = "0.30.3", features = ["bytemuck", "rand"] }
+itertools = "0.14.0"
+log = "0.4.27"
+wgpu = "25.0.0"
+winit = "0.30.11"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.100"
+web-sys = { version = "0.3.77", features = ["HtmlCanvasElement"] }
+web-time = "1.1.0"
